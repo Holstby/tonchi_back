@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+
+  redis:
+    image: redis:7
+    volumes:
+      - "./redis_data:/data"
+    command: 'redis-server --save 60 1 --loglevel warning'
+    ports:
+      - "63795:6379"
+    networks:
+      - serega-network
+
+  serega_backend:
+    build:
+      context: '.'
+      dockerfile: 'Dockerfile'
+    volumes:
+      - "./app:/app"
+    ports:
+      - "127.0.0.1:8200:8000"
+    command: uvicorn main:app --workers 1 --port 8000 --host 0.0.0.0
+    networks:
+      - serega-network
+
+networks:
+  serega-network:
+    name: serega-network
